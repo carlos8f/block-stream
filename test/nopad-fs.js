@@ -38,6 +38,12 @@ tap.test('check image integrity', function (t) {
 tap.test('no pad, fs to BlockStream to fs', function (t) {
   fs.createReadStream(tmp)
     .pipe(new BlockStream(256, { nopad: true }))
+    .on('drain', function () {
+      var self = this
+      setImmediate(function () {
+        self.flush()
+      });
+    })
     .pipe(fs.createWriteStream(tmp2))
     .on('finish', function () { t.end() })
 })
