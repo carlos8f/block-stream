@@ -73,7 +73,7 @@ BlockStream.prototype.flush = function () {
 BlockStream.prototype._emitChunk = function (flush) {
   // debug("emitChunk flush=%j emitting=%j paused=%j", flush, this._emitting, this._paused)
 
-  var unpaddedLength = this._bufferLength;
+  var unpaddedLength = Math.min(this._bufferLength, this._chunkSize);
 
   // emit a <chunkSize> chunk
   if (flush && this._zeroes) {
