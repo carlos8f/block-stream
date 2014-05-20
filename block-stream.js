@@ -73,7 +73,7 @@ BlockStream.prototype.flush = function () {
 BlockStream.prototype._emitChunk = function (flush) {
   // debug("emitChunk flush=%j emitting=%j paused=%j", flush, this._emitting, this._paused)
 
-  var origLength = this._bufferLength;
+  var unpaddedLength = this._bufferLength;
 
   // emit a <chunkSize> chunk
   if (flush && this._zeroes) {
@@ -144,7 +144,8 @@ BlockStream.prototype._emitChunk = function (flush) {
     assert(out.length === this._chunkSize)
     // debug("emitting data", out)
     // debug("   BS emitting, paused=%j", this._paused, this._bufferLength)
-    this.emit("data", out)
+    // hack: also output the original, unpadded length.
+    this.emit("data", out, unpaddedLength)
     out = null
   }
   // debug("    BS out of loops", this._bufferLength)
@@ -183,11 +184,7 @@ BlockStream.prototype._emitChunk = function (flush) {
         this._bufferLength -= curHas
       }
 
-      // hack: set an "unpaddedLength" property on the buffer with the original,
-      // unpadded length.
-      out.unpaddedLength = origLength;
-
-      this.emit("data", out)
+      this.emit("data")
     }
     // truncate
     this._buffer.length = 0
