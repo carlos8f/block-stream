@@ -7,6 +7,7 @@ module.exports = BlockStream
 var Stream = require("stream").Stream
   , inherits = require("inherits")
   , assert = require("assert").ok
+  , randomBytes = require("crypto").randomBytes
   , debug = process.env.DEBUG ? console.error : function () {}
 
 function BlockStream (size, opt) {
@@ -17,6 +18,7 @@ function BlockStream (size, opt) {
   this._buffer = []
   this._bufferLength = 0
   if (this._opt.nopad) this._zeroes = false
+  else if (this._opt.random) this._zeroes = true
   else {
     this._zeroes = new Buffer(this._chunkSize)
     for (var i = 0; i < this._chunkSize; i ++) {
@@ -83,7 +85,10 @@ BlockStream.prototype._emitChunk = function (flush) {
     if (padBytes !== 0) padBytes = this._chunkSize - padBytes
     if (padBytes > 0) {
       // debug("padBytes", padBytes, this._zeroes.slice(0, padBytes))
-      this._buffer.push(this._zeroes.slice(0, padBytes))
+      var zeroes = this._zeroes === true
+        ? randomBytes(padBytes)
+        : this._zeroes.slice(0, padBytes)
+      this._buffer.push(zeroes)
       this._bufferLength += padBytes
       // debug(this._buffer[this._buffer.length - 1].length, this._bufferLength)
     }
@@ -184,7 +189,7 @@ BlockStream.prototype._emitChunk = function (flush) {
         this._bufferLength -= curHas
       }
 
-      this.emit("data")
+      this.emit("data", out)
     }
     // truncate
     this._buffer.length = 0
