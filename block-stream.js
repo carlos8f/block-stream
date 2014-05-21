@@ -18,7 +18,7 @@ function BlockStream (size, opt) {
   this._buffer = []
   this._bufferLength = 0
   if (this._opt.nopad) this._zeroes = false
-  else if (this._opt.random) this._zeroes = true
+  else if (this._opt.randompad) this._zeroes = true
   else {
     this._zeroes = new Buffer(this._chunkSize)
     for (var i = 0; i < this._chunkSize; i ++) {
