@@ -57,7 +57,7 @@ BlockStream.prototype.pause = function () {
 BlockStream.prototype.resume = function () {
   // debug("   BS resume")
   this._paused = false
-  return this._emitChunk()
+  return this._emitChunk(this._ended)
 }
 
 BlockStream.prototype.end = function (chunk) {
